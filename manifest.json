@@ -1,0 +1,10 @@
+{
+  "name": "Krystallon Villas",
+  "short_name": "Krystallon",
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#d1dcd9",
+  "theme_color": "#d1dcd9",
+  "icons": [{"src": "./logo.png", "sizes": "192x192", "type": "image/png"}]
+}

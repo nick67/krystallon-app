@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krystallon · Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:    #d1dcd9;
+  --bg2:   #c2cfcb;
+  --bg3:   #b5c5c0;
+  --panel: #e8efed;
+  --white: rgba(255,255,255,0.85);
+  --mgray: #747c71;
+  --dgray: #4e5650;
+  --blue:  #67919f;
+  --blue2: #4d7a89;
+  --red:   #9f5f5f;
+  --green: #5f8a6e;
+  --border:rgba(116,124,113,0.22);
+  --text:  #2a2f2a;
+}
+body{font-family:'Raleway',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* ── LOGIN ── */
+#login-screen{
+  display:flex;align-items:center;justify-content:center;
+  min-height:100vh;
+  background:linear-gradient(135deg,#c2cfcb,#d1dcd9);
+}
+.login-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-top:3px solid var(--blue);
+  border-radius:16px;
+  padding:48px 52px;
+  width:380px;
+  box-shadow:0 20px 60px rgba(42,47,42,0.12);
+  text-align:center;
+}
+.login-card h1{font-size:22px;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--dgray);margin-bottom:4px;}
+.login-card p{font-size:11px;font-weight:300;color:var(--mgray);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:32px;}
+.login-card input{
+  width:100%;padding:12px 16px;
+  background:var(--white);border:1px solid var(--border);border-radius:8px;
+  font-family:'Raleway',sans-serif;font-size:15px;font-weight:300;color:var(--text);
+  letter-spacing:0.15em;text-align:center;
+  outline:none;transition:border-color 0.2s;
+  margin-bottom:16px;
+}
+.login-card input:focus{border-color:var(--blue);}
+.login-card input::placeholder{letter-spacing:0.1em;color:var(--mgray);}
+.btn-login{
+  width:100%;padding:12px;
+  background:var(--blue);border:none;border-radius:8px;
+  color:#fff;font-family:'Raleway',sans-serif;font-size:12px;
+  font-weight:600;letter-spacing:0.22em;text-transform:uppercase;
+  cursor:pointer;transition:background 0.2s;
+}
+.btn-login:hover{background:var(--blue2);}
+.login-error{color:var(--red);font-size:12px;margin-top:12px;display:none;}
+
+/* ── MAIN APP ── */
+#admin-app{display:none;}
+
+/* TOPBAR */
+.topbar{
+  background:var(--panel);border-bottom:1px solid var(--border);
+  padding:14px 32px;
+  display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.topbar-left{display:flex;align-items:center;gap:20px;}
+.topbar h1{font-size:13px;font-weight:700;letter-spacing:0.3em;text-transform:uppercase;color:var(--dgray);}
+.topbar span{font-size:10px;color:var(--mgray);letter-spacing:0.15em;text-transform:uppercase;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.btn{
+  padding:8px 18px;border-radius:7px;
+  font-family:'Raleway',sans-serif;font-size:10.5px;font-weight:600;
+  letter-spacing:0.15em;text-transform:uppercase;cursor:pointer;
+  border:none;transition:all 0.2s;
+}
+.btn-outline{background:none;border:1px solid var(--border);color:var(--mgray);}
+.btn-outline:hover{border-color:var(--blue);color:var(--blue);}
+.btn-blue{background:var(--blue);color:#fff;}
+.btn-blue:hover{background:var(--blue2);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-green:hover{background:#4d7a5c;}
+.btn-red{background:none;border:1px solid rgba(159,95,95,0.3);color:var(--red);font-size:10px;}
+.btn-red:hover{background:var(--red);color:#fff;}
+.btn-logout{background:none;border:1px solid var(--border);color:var(--mgray);font-size:10px;}
+.btn-logout:hover{border-color:var(--red);color:var(--red);}
+
+/* LAYOUT */
+.app-body{display:flex;flex-direction:column;min-height:calc(100vh - 57px);}
+.app-inner{display:flex;flex:1;}
+
+/* SIDEBAR */
+.aside{
+  width:210px;flex-shrink:0;
+  background:rgba(0,0,0,0.05);
+  border-right:1px solid var(--border);
+  padding:20px 10px;
+}
+.aside-section{font-size:8px;font-weight:700;letter-spacing:0.4em;text-transform:uppercase;color:var(--mgray);opacity:0.7;padding:14px 14px 5px;}
+.aside-btn{
+  display:flex;align-items:center;gap:10px;
+  width:100%;padding:9px 14px;border-radius:7px;
+  background:none;border:none;
+  font-family:'Raleway',sans-serif;font-size:12px;font-weight:400;
+  color:var(--mgray);cursor:pointer;transition:all 0.2s;text-align:left;
+}
+.aside-btn .ic{font-size:14px;min-width:20px;text-align:center;}
+.aside-btn:hover{background:rgba(255,255,255,0.5);color:var(--text);}
+.aside-btn.on{background:rgba(103,145,159,0.18);color:var(--blue2);border-left:2px solid var(--blue);padding-left:12px;font-weight:600;}
+.aside-divider{height:1px;background:var(--border);margin:6px 10px;}
+
+/* MAIN */
+.main{flex:1;padding:28px 32px;max-width:960px;}
+
+/* SECTION HEADER */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;}
+.sec-hdr h2{font-size:22px;font-weight:200;letter-spacing:0.1em;text-transform:uppercase;color:var(--dgray);}
+.blue-line{width:36px;height:2px;background:linear-gradient(90deg,var(--blue),transparent);margin:6px 0 0;}
+
+/* LANG TABS */
+.lang-tabs{display:flex;gap:4px;margin-bottom:18px;}
+.lt{
+  padding:6px 14px;border-radius:5px;border:1px solid var(--border);
+  background:none;font-family:'Raleway',sans-serif;font-size:10px;
+  font-weight:600;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--mgray);cursor:pointer;transition:all 0.2s;
+}
+.lt.on{background:var(--blue);border-color:var(--blue);color:#fff;}
+
+/* ITEMS LIST */
+.items-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px;}
+.item-row{
+  background:var(--white);border:1px solid var(--border);border-radius:10px;
+  padding:14px 18px;
+  display:flex;align-items:center;gap:14px;
+  transition:box-shadow 0.2s;
+}
+.item-row:hover{box-shadow:0 2px 12px rgba(103,145,159,0.1);}
+.item-emoji{font-size:22px;min-width:32px;text-align:center;}
+.item-info{flex:1;min-width:0;}
+.item-name{font-size:13px;font-weight:600;color:var(--dgray);margin-bottom:2px;}
+.item-type{font-size:10px;font-weight:500;color:var(--blue);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:2px;}
+.item-desc{font-size:11px;color:var(--mgray);font-weight:300;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.item-tag{
+  font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+  background:rgba(103,145,159,0.12);color:var(--blue2);
+  border:1px solid rgba(103,145,159,0.25);border-radius:12px;
+  padding:2px 8px;white-space:nowrap;
+}
+.item-actions{display:flex;gap:6px;flex-shrink:0;}
+.btn-edit{
+  padding:6px 12px;border-radius:6px;border:1px solid var(--border);
+  background:none;font-family:'Raleway',sans-serif;font-size:9.5px;font-weight:600;
+  letter-spacing:0.12em;text-transform:uppercase;color:var(--mgray);cursor:pointer;transition:all 0.2s;
+}
+.btn-edit:hover{border-color:var(--blue);color:var(--blue);}
+.btn-del{
+  padding:6px 10px;border-radius:6px;border:1px solid rgba(159,95,95,0.25);
+  background:none;font-family:'Raleway',sans-serif;font-size:11px;
+  color:var(--red);cursor:pointer;transition:all 0.2s;
+}
+.btn-del:hover{background:var(--red);color:#fff;border-color:var(--red);}
+.empty-state{
+  text-align:center;padding:40px;color:var(--mgray);
+  font-size:13px;font-weight:300;letter-spacing:0.05em;
+  background:var(--white);border:1px dashed var(--border);border-radius:10px;
+}
+
+/* FORM */
+.form-card{
+  background:var(--white);border:1px solid var(--border);
+  border-top:2px solid var(--blue);
+  border-radius:12px;padding:24px 28px;
+  margin-bottom:20px;display:none;
+}
+.form-card.open{display:block;}
+.form-card h3{font-size:13px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--dgray);margin-bottom:20px;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-grid.full{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.field label{font-size:9.5px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--mgray);}
+.field input,.field textarea,.field select{
+  padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:7px;
+  font-family:'Raleway',sans-serif;font-size:13px;font-weight:300;color:var(--text);
+  outline:none;transition:border-color 0.2s;resize:vertical;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--blue);}
+.field textarea{min-height:80px;}
+.form-actions{display:flex;gap:10px;margin-top:18px;}
+
+/* VILLA FIELDS */
+.villa-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.villa-row{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.villa-row label{font-size:9px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--mgray);}
+.villa-row input,.villa-row textarea{
+  background:var(--white);border:1px solid var(--border);border-radius:6px;
+  padding:7px 10px;font-family:'Raleway',sans-serif;font-size:13px;
+  font-weight:300;color:var(--text);outline:none;transition:border-color 0.2s;
+  resize:vertical;
+}
+.villa-row input:focus,.villa-row textarea:focus{border-color:var(--blue);}
+
+/* EXPORT/IMPORT */
+.io-section{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:24px 28px;margin-bottom:20px;}
+.io-section h3{font-size:13px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;color:var(--dgray);margin-bottom:6px;}
+.io-section p{font-size:12px;font-weight:300;color:var(--mgray);margin-bottom:16px;line-height:1.6;}
+.io-actions{display:flex;gap:10px;flex-wrap:wrap;}
+.io-code{
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:12px;margin-top:14px;font-family:monospace;font-size:11px;
+  color:var(--dgray);max-height:180px;overflow-y:auto;word-break:break-all;
+  display:none;white-space:pre-wrap;
+}
+.io-code.open{display:block;}
+
+/* STATUS BAR */
+.status-bar{
+  font-size:11px;font-weight:500;letter-spacing:0.06em;
+  padding:8px 20px;text-align:center;min-height:34px;
+  transition:all 0.3s;color:var(--mgray);
+  border-bottom:1px solid transparent;
+}
+.status-bar.info{background:rgba(103,145,159,0.1);color:var(--blue2);border-color:rgba(103,145,159,0.2);}
+.status-bar.ok{background:rgba(95,138,110,0.1);color:var(--green);border-color:rgba(95,138,110,0.2);}
+.status-bar.err{background:rgba(159,95,95,0.1);color:var(--red);border-color:rgba(159,95,95,0.2);}
+.toast{
+  position:fixed;bottom:24px;right:24px;z-index:999;
+  background:var(--dgray);color:#fff;
+  padding:12px 20px;border-radius:8px;
+  font-size:12px;font-weight:500;letter-spacing:0.08em;
+  opacity:0;transform:translateY(10px);
+  transition:all 0.3s;pointer-events:none;
+}
+.toast.show{opacity:1;transform:none;}
+.toast.ok{background:var(--green);}
+.toast.err{background:var(--red);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(42,47,42,0.4);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--panel);border:1px solid rgba(159,95,95,0.3);border-top:2px solid var(--red);border-radius:14px;padding:32px;max-width:380px;width:90%;text-align:center;}
+.modal h3{font-size:16px;font-weight:600;color:var(--dgray);margin-bottom:8px;}
+.modal p{font-size:13px;font-weight:300;color:var(--mgray);margin-bottom:22px;line-height:1.6;}
+.modal-actions{display:flex;gap:10px;justify-content:center;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-card">
+    <h1>Krystallon</h1>
+    <p>Admin Panel</p>
+    <input type="password" id="pwd-input" placeholder="Κωδικός πρόσβασης" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" onclick="doLogin()">Είσοδος</button>
+    <div class="login-error" id="login-err">❌ Λάθος κωδικός</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="admin-app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <h1>Krystallon Admin</h1>
+      <span>Διαχείριση Περιεχομένου</span>
+    </div>
+    <div class="topbar-right">
+      <button class="btn btn-outline" onclick="showSection('io')">📤 Export / Import</button>
+      <button class="btn btn-logout" onclick="doLogout()">Αποσύνδεση</button>
+    </div>
+  </div>
+
+  <div class="app-body">
+    <div id="status-bar" class="status-bar"></div>
+    <div class="app-inner">
+    <!-- SIDEBAR -->
+    <aside class="aside">
+      <div class="aside-section">Κατηγορίες</div>
+      <button class="aside-btn on" onclick="showSection('rest')" id="ab-rest"><span class="ic">🍽️</span>Εστιατόρια</button>
+      <button class="aside-btn" onclick="showSection('beach')" id="ab-beach"><span class="ic">🏖️</span>Παραλίες</button>
+      <button class="aside-btn" onclick="showSection('sights')" id="ab-sights"><span class="ic">🏛️</span>Αξιοθέατα</button>
+      <button class="aside-btn" onclick="showSection('act')" id="ab-act"><span class="ic">🤿</span>Δραστηριότητες</button>
+      <button class="aside-btn" onclick="showSection('exc')" id="ab-exc"><span class="ic">🗺️</span>Εκδρομές</button>
+      <div class="aside-divider"></div>
+      <div class="aside-section">Άλλα</div>
+      <button class="aside-btn" onclick="showSection('villa')" id="ab-villa"><span class="ic">🌿</span>Παροχές Villas</button>
+      <button class="aside-btn" onclick="showSection('io')" id="ab-io"><span class="ic">📤</span>Export / Import</button>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main" id="main-area"></div>
+    </div><!-- app-inner -->
+  </div><!-- app-body -->
+</div><!-- admin-app -->
+
+<!-- DELETE MODAL -->
+<div class="modal-bg" id="del-modal">
+  <div class="modal">
+    <h3>Διαγραφή εγγραφής;</h3>
+    <p>Αυτή η ενέργεια δεν μπορεί να αναιρεθεί. Η εγγραφή θα αφαιρεθεί από όλες τις γλώσσες.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal()">Ακύρωση</button>
+      <button class="btn btn-red" id="confirm-del">Διαγραφή</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── GITHUB CONFIG ────────────────────────────────────────────────
+const API = '/api/data';
+
+const ADMIN_PASS = 'krystallon2024!';
+
+// ── DEFAULT DATA (same as index.html) ────────────────────────────
+const DEFAULT_DATA = {
+  rest:{
+    el:[
+      {e:'🐟',n:'Θαλασσινά Παλαιόχωρας',t:'Παραδοσιακή ταβέρνα',d:'Φρέσκα ψάρια και θαλασσινά απευθείας από τους ψαράδες. Θέα στη θάλασσα.',tag:'Θαλασσινά',loc:'Παραλιακός δρόμος',hours:'12:00–23:00'},
+      {e:'☕',n:'Καφέ Κρύσταλλο',t:'Καφετέρια – Snack bar',d:'Πρωινό, καφές, χυμοί και ελαφριά γεύματα. Εξαιρετική θέα στο λιμάνι.',tag:'Καφέ',loc:'Λιμάνι Παλαιόχωρας',hours:'07:30–01:00'},
+      {e:'🍕',n:'La Piazza',t:'Ιταλικό εστιατόριο',d:'Αυθεντικές πίτσες, pasta και κρητικά πιάτα σε ζεστό περιβάλλον.',tag:'Ιταλικό',loc:'Κεντρική πλατεία',hours:'18:00–23:30'},
+      {e:'🥗',n:'Green Garden',t:'Βεγκετάριαν & Vegan',d:'Φρέσκες σαλάτες, smoothie bowls και υγιεινά γεύματα.',tag:'Vegan',loc:'Κεντρικός πεζόδρομος',hours:'09:00–22:00'},
+      {e:'🍺',n:'Sunset Bar',t:'Beach bar',d:'Cocktails και μουσική με αξέχαστη θέα στο ηλιοβασίλεμα.',tag:'Bar',loc:'Παραλία Παλαιόχωρας',hours:'11:00–02:00'},
+      {e:'🫒',n:'Κρητική Γωνιά',t:'Παραδοσιακή κρητική κουζίνα',d:'Ντακος, χοχλιοί, καλτσούνια και τοπικοί μεζέδες.',tag:'Κρητικό',loc:'Παλιά αγορά',hours:'12:00–22:30'},
+    ],
+    en:[
+      {e:'🐟',n:'Paleochora Seafood',t:'Traditional taverna',d:'Fresh fish directly from local fishermen. Sea view.',tag:'Seafood',loc:'Seafront road',hours:'12:00–23:00'},
+      {e:'☕',n:'Crystal Café',t:'Café – Snack bar',d:'Breakfast, coffee, juices and light meals. Harbour view.',tag:'Café',loc:'Paleochora Harbour',hours:'07:30–01:00'},
+      {e:'🍕',n:'La Piazza',t:'Italian restaurant',d:'Authentic pizzas, pasta and Cretan dishes in a cozy setting.',tag:'Italian',loc:'Central square',hours:'18:00–23:30'},
+      {e:'🥗',n:'Green Garden',t:'Vegetarian & Vegan',d:'Fresh salads, smoothie bowls and healthy meals.',tag:'Vegan',loc:'Main pedestrian street',hours:'09:00–22:00'},
+      {e:'🍺',n:'Sunset Bar',t:'Beach bar',d:'Cocktails and music with an unforgettable sunset view.',tag:'Bar',loc:'Paleochora beach',hours:'11:00–02:00'},
+      {e:'🫒',n:'Cretan Corner',t:'Traditional Cretan cuisine',d:'Dakos, snails, kaltsounia and local meze plates.',tag:'Cretan',loc:'Old market',hours:'12:00–22:30'},
+    ],
+    de:[
+      {e:'🐟',n:'Meeresfrüchte Paleochora',t:'Traditionelle Taverne',d:'Frischer Fisch direkt von den Fischern. Meerblick.',tag:'Meeresfrüchte',loc:'Strandpromenade',hours:'12:00–23:00'},
+      {e:'☕',n:'Kristall Café',t:'Café – Snackbar',d:'Frühstück, Kaffee, Säfte und leichte Mahlzeiten. Hafen-Panorama.',tag:'Café',loc:'Hafen Paleochora',hours:'07:30–01:00'},
+      {e:'🍕',n:'La Piazza',t:'Italienisches Restaurant',d:'Authentische Pizzen, Pasta und kretische Gerichte.',tag:'Italienisch',loc:'Zentralplatz',hours:'18:00–23:30'},
+      {e:'🥗',n:'Green Garden',t:'Vegetarisch & Vegan',d:'Frische Salate, Smoothie Bowls und gesunde Mahlzeiten.',tag:'Vegan',loc:'Fußgängerzone',hours:'09:00–22:00'},
+      {e:'🍺',n:'Sunset Bar',t:'Strandbar',d:'Cocktails und Musik mit unvergesslichem Sonnenuntergang.',tag:'Bar',loc:'Strand Paleochora',hours:'11:00–02:00'},
+      {e:'🫒',n:'Kretische Ecke',t:'Traditionelle kretische Küche',d:'Dakos, Schnecken, Kaltsounia und lokale Mezedes.',tag:'Kretisch',loc:'Alter Markt',hours:'12:00–22:30'},
+    ],
+    fr:[
+      {e:'🐟',n:'Fruits de Mer Paleochora',t:'Taverne traditionnelle',d:'Poisson frais directement des pêcheurs locaux. Vue mer.',tag:'Fruits de mer',loc:'Route du bord de mer',hours:'12:00–23:00'},
+      {e:'☕',n:'Café Cristal',t:'Café – Snack bar',d:'Petit-déjeuner, café, jus et repas légers. Vue sur le port.',tag:'Café',loc:'Port de Paleochora',hours:'07:30–01:00'},
+      {e:'🍕',n:'La Piazza',t:'Restaurant italien',d:'Pizzas authentiques, pasta et plats crétois.',tag:'Italien',loc:'Place centrale',hours:'18:00–23:30'},
+      {e:'🥗',n:'Green Garden',t:'Végétarien & Vegan',d:'Salades fraîches, smoothie bowls et repas sains.',tag:'Vegan',loc:'Rue piétonne',hours:'09:00–22:00'},
+      {e:'🍺',n:'Sunset Bar',t:'Bar de plage',d:'Cocktails et musique avec vue inoubliable sur le coucher de soleil.',tag:'Bar',loc:'Plage de Paleochora',hours:'11:00–02:00'},
+      {e:'🫒',n:'Coin Crétois',t:'Cuisine crétoise traditionnelle',d:'Dakos, escargots, kaltsounia et mezze locaux.',tag:'Crétois',loc:'Vieux marché',hours:'12:00–22:30'},
+    ]
+  },
+  beach:{
+    el:[
+      {e:'🏖️',n:'Παραλία Παλαιόχωρας (Sandy)',t:'Αμμώδης παραλία',d:'Η κύρια παραλία του χωριού, με αμμουδιά και ξαπλώστρες. Ήρεμα νερά.',tag:'5 λεπτά',loc:'Κεντρικό Παλαιόχωρα',dist:'5 λεπτά πεζή'},
+      {e:'🌊',n:'Παραλία Παλαιόχωρας (Pebble)',t:'Χαλικιά',d:'Η δυτική πλευρά με χαλίκια. Ιδανική για ιστιοσανίδα λόγω Μελτεμιών.',tag:'5 λεπτά',loc:'Δυτικό Παλαιόχωρα',dist:'5 λεπτά πεζή'},
+      {e:'💎',n:'Γλυκή Νερά',t:'Απομονωμένη παραλία',d:'Μαγευτική παραλία με κρυστάλλινα νερά. Προσβάσιμη μόνο με βάρκα ή μονοπάτι.',tag:'25 λεπτά',loc:'Ανατολικά Παλαιόχωρας',dist:'25 λεπτά με βάρκα'},
+      {e:'🐢',n:'Ελαφονήσι',t:'Ροζ άμμος',d:'Μία από τις πιο όμορφες παραλίες της Ευρώπης με χαρακτηριστική ροζ άμμο.',tag:'45 λεπτά',loc:'45 λεπτά ΒΔ',dist:'45 λεπτά αυτοκίνητο'},
+      {e:'🏝️',n:'Νήσος Γαύδος',t:'Νοτιότερο σημείο Ευρώπης',d:'Εξωτικό νησί με παραλίες Sarakiniko, Korfos και Agios Ioannis.',tag:'Πλοίο 1.5ω',loc:'Λιμάνι Παλαιόχωρας',dist:'1.5 ώρα με πλοίο'},
+    ],
+    en:[
+      {e:'🏖️',n:'Paleochora Beach (Sandy)',t:'Sandy beach',d:'The main village beach with sand and sunbeds. Calm waters.',tag:'5 min',loc:'Central Paleochora',dist:'5 min walk'},
+      {e:'🌊',n:'Paleochora Beach (Pebble)',t:'Pebble beach',d:'The west side. Perfect for windsurfing due to the Meltemi winds.',tag:'5 min',loc:'West Paleochora',dist:'5 min walk'},
+      {e:'💎',n:'Glyki Nera',t:'Secluded beach',d:'Crystal clear waters. Accessible only by boat or trail.',tag:'25 min',loc:'East of Paleochora',dist:'25 min by boat'},
+      {e:'🐢',n:'Elafonisi',t:'Pink sand',d:'One of Europe\'s most beautiful beaches with pink-tinted sand.',tag:'45 min',loc:'45 min NW',dist:'45 min by car'},
+      {e:'🏝️',n:'Gavdos Island',t:'Europe\'s southernmost point',d:'Exotic island with Sarakiniko, Korfos, Agios Ioannis beaches.',tag:'Ferry 1.5h',loc:'Paleochora Harbour',dist:'1.5h by ferry'},
+    ],
+    de:[
+      {e:'🏖️',n:'Strand Paleochora (Sand)',t:'Sandstrand',d:'Der Hauptstrand mit Sand und Liegen. Ruhiges Wasser.',tag:'5 Min',loc:'Zentrum Paleochora',dist:'5 Min zu Fuß'},
+      {e:'🌊',n:'Strand Paleochora (Kiesel)',t:'Kiesstrand',d:'Die Westseite. Ideal zum Windsurfen wegen der Meltemi-Winde.',tag:'5 Min',loc:'West Paleochora',dist:'5 Min zu Fuß'},
+      {e:'💎',n:'Glyki Nera',t:'Abgelegener Strand',d:'Kristallklares Wasser. Nur per Boot oder Wanderweg erreichbar.',tag:'25 Min',loc:'Östlich Paleochora',dist:'25 Min mit Boot'},
+      {e:'🐢',n:'Elafonisi',t:'Rosa Sand',d:'Einer der schönsten Strände Europas mit rosa Sand.',tag:'45 Min',loc:'45 Min NW',dist:'45 Min mit Auto'},
+      {e:'🏝️',n:'Gavdos Insel',t:'Südlichster Punkt Europas',d:'Exotische Insel mit traumhaften Stränden.',tag:'Fähre 1,5h',loc:'Hafen Paleochora',dist:'1,5h mit Fähre'},
+    ],
+    fr:[
+      {e:'🏖️',n:'Plage Paleochora (Sable)',t:'Plage de sable',d:'La plage principale avec sable et transats. Eaux calmes.',tag:'5 min',loc:'Centre Paleochora',dist:'5 min à pied'},
+      {e:'🌊',n:'Plage Paleochora (Galets)',t:'Plage de galets',d:'Le côté ouest. Idéal pour la planche à voile grâce aux vents Meltemi.',tag:'5 min',loc:'Ouest Paleochora',dist:'5 min à pied'},
+      {e:'💎',n:'Glyki Nera',t:'Plage isolée',d:'Eaux cristallines. Accessible uniquement en bateau ou sentier.',tag:'25 min',loc:'Est de Paleochora',dist:'25 min en bateau'},
+      {e:'🐢',n:'Elafonisi',t:'Sable rose',d:'L\'une des plus belles plages d\'Europe avec sable rose.',tag:'45 min',loc:'45 min NO',dist:'45 min en voiture'},
+      {e:'🏝️',n:'Île de Gavdos',t:'Point le plus au sud d\'Europe',d:'Île exotique avec plages paradisiaques.',tag:'Ferry 1h30',loc:'Port Paleochora',dist:'1h30 en ferry'},
+    ]
+  },
+  sights:{
+    el:[
+      {e:'🏰',n:'Βενετικό Κάστρο',t:'Ιστορικό μνημείο',d:'Ερείπια βενετικού φρουρίου με πανοραμική θέα σε Αιγαίο και Λιβυκό.',tag:'10 λεπτά',loc:'Ακρωτήριο Παλαιόχωρας',dist:'10 λεπτά πεζή'},
+      {e:'⛪',n:'Βυζαντινές Εκκλησίες',t:'Θρησκευτικά μνημεία',d:'Δεκάδες βυζαντινές εκκλησίες με αξιόλογες αγιογραφίες.',tag:'Γύρω περιοχή',loc:'Περιοχή Παλαιόχωρας',dist:'Διάφορες αποστάσεις'},
+      {e:'🏛️',n:'Αρχαία Ελύρος',t:'Αρχαιολογικός χώρος',d:'Σημαντική αρχαία πόλη κοντά στο Ροδοβάνι.',tag:'15 λεπτά',loc:'Ροδοβάνι, 12km',dist:'15 λεπτά αυτοκίνητο'},
+      {e:'🌿',n:'Φαράγγι Σαμαριάς',t:'UNESCO · Φυσικό Τοπίο',d:'Το μεγαλύτερο φαράγγι της Ευρώπης. Αξέχαστη πεζοπορία 16km.',tag:'1.5 ώρα',loc:'Χανιά, 75km',dist:'1.5 ώρα αυτοκίνητο'},
+    ],
+    en:[
+      {e:'🏰',n:'Venetian Castle',t:'Historic monument',d:'Ruins of a Venetian fortress with panoramic sea views.',tag:'10 min',loc:'Paleochora Cape',dist:'10 min walk'},
+      {e:'⛪',n:'Byzantine Churches',t:'Religious monuments',d:'Dozens of Byzantine churches with remarkable frescoes.',tag:'Various',loc:'Paleochora area',dist:'Various distances'},
+      {e:'🏛️',n:'Ancient Elyros',t:'Archaeological site',d:'Significant ancient city near Rodovani.',tag:'15 min',loc:'Rodovani, 12km',dist:'15 min by car'},
+      {e:'🌿',n:'Samaria Gorge',t:'UNESCO · Natural Landscape',d:'The longest gorge in Europe. Unforgettable 16km hike.',tag:'1.5h',loc:'Chania, 75km',dist:'1.5h by car'},
+    ],
+    de:[
+      {e:'🏰',n:'Venezianische Burg',t:'Historisches Denkmal',d:'Ruinen einer venezianischen Festung mit Panoramablick.',tag:'10 Min',loc:'Kap Paleochora',dist:'10 Min zu Fuß'},
+      {e:'⛪',n:'Byzantinische Kirchen',t:'Religiöse Denkmäler',d:'Dutzende byzantinische Kirchen mit bemerkenswerten Fresken.',tag:'Verschiedene',loc:'Region Paleochora',dist:'Verschiedene Entfernungen'},
+      {e:'🏛️',n:'Antike Elyros',t:'Archäologische Stätte',d:'Bedeutende antike Stadt bei Rodovani.',tag:'15 Min',loc:'Rodovani, 12km',dist:'15 Min mit Auto'},
+      {e:'🌿',n:'Samaria-Schlucht',t:'UNESCO · Naturlandschaft',d:'Die längste Schlucht Europas. Unvergessliche 16km Wanderung.',tag:'1,5h',loc:'Chania, 75km',dist:'1,5h mit Auto'},
+    ],
+    fr:[
+      {e:'🏰',n:'Château Vénitien',t:'Monument historique',d:'Ruines d\'une forteresse vénitienne avec vue panoramique.',tag:'10 min',loc:'Cap Paleochora',dist:'10 min à pied'},
+      {e:'⛪',n:'Églises Byzantines',t:'Monuments religieux',d:'Des dizaines d\'églises byzantines avec de remarquables fresques.',tag:'Divers',loc:'Région Paleochora',dist:'Distances variées'},
+      {e:'🏛️',n:'Elyros Antique',t:'Site archéologique',d:'Importante cité antique près de Rodovani.',tag:'15 min',loc:'Rodovani, 12km',dist:'15 min en voiture'},
+      {e:'🌿',n:'Gorge de Samaria',t:'UNESCO · Paysage naturel',d:'La plus longue gorge d\'Europe. Randonnée inoubliable de 16km.',tag:'1h30',loc:'Chania, 75km',dist:'1h30 en voiture'},
+    ]
+  },
+  act:{
+    el:[
+      {e:'🤿',n:'Καταδύσεις & Snorkeling',t:'Θαλάσσια δραστηριότητα',d:'Κατάδυση με αναπνευστήρα ή εξοπλισμό κατάδυσης στα διαυγή νερά.',tag:'Νερό'},
+      {e:'🏄',n:'Windsurfing',t:'Θαλάσσιο άθλημα',d:'Η δυτική παραλία είναι ιδανική λόγω Μελτεμιών.',tag:'Νερό'},
+      {e:'🚵',n:'Mountain Biking',t:'Ποδηλασία βουνού',d:'Μονοπάτια μέσα από ελαιώνες και χωριά της ενδοχώρας.',tag:'Στεριά'},
+      {e:'🥾',n:'Μονοπάτι Ε4',t:'Ευρωπαϊκό μονοπάτι',d:'Το μονοπάτι Ε4 περνά από την Παλαιόχωρα.',tag:'Πεζοπορία'},
+      {e:'🎣',n:'Ψάρεμα',t:'Αλιεία',d:'Εμπειρία αλιείας με τοπικούς ψαράδες.',tag:'Θάλασσα'},
+      {e:'🧘',n:'Yoga & Wellness',t:'Χαλάρωση',d:'Μαθήματα yoga στην παραλία το πρωί.',tag:'Wellness'},
+    ],
+    en:[
+      {e:'🤿',n:'Diving & Snorkeling',t:'Water activity',d:'Snorkeling or scuba diving in the crystal clear waters.',tag:'Water'},
+      {e:'🏄',n:'Windsurfing',t:'Water sport',d:'The west beach is perfect due to the Meltemi winds.',tag:'Water'},
+      {e:'🚵',n:'Mountain Biking',t:'Cycling',d:'Trails through olive groves and villages.',tag:'Land'},
+      {e:'🥾',n:'E4 Hiking Trail',t:'European path',d:'The E4 path passes through Paleochora.',tag:'Hiking'},
+      {e:'🎣',n:'Fishing',t:'Sea fishing',d:'Fishing experience with local fishermen.',tag:'Sea'},
+      {e:'🧘',n:'Yoga & Wellness',t:'Relaxation',d:'Morning yoga classes on the beach.',tag:'Wellness'},
+    ],
+    de:[
+      {e:'🤿',n:'Tauchen & Schnorcheln',t:'Wasseraktivität',d:'Schnorcheln oder Tauchen im kristallklaren Wasser.',tag:'Wasser'},
+      {e:'🏄',n:'Windsurfen',t:'Wassersport',d:'Der Weststrand ist wegen der Meltemi-Winde ideal.',tag:'Wasser'},
+      {e:'🚵',n:'Mountainbiking',t:'Radfahren',d:'Trails durch Olivenhaine und Dörfer.',tag:'Land'},
+      {e:'🥾',n:'Wanderweg E4',t:'Europäischer Pfad',d:'Der E4 führt durch Paleochora.',tag:'Wandern'},
+      {e:'🎣',n:'Angeln',t:'Meeresangeln',d:'Angelausflug mit einheimischen Fischern.',tag:'Meer'},
+      {e:'🧘',n:'Yoga & Wellness',t:'Entspannung',d:'Morgen-Yoga am Strand.',tag:'Wellness'},
+    ],
+    fr:[
+      {e:'🤿',n:'Plongée & Snorkeling',t:'Activité nautique',d:'Snorkeling ou plongée dans les eaux cristallines.',tag:'Eau'},
+      {e:'🏄',n:'Planche à voile',t:'Sport nautique',d:'La plage ouest est idéale grâce aux vents Meltemi.',tag:'Eau'},
+      {e:'🚵',n:'VTT',t:'Cyclisme',d:'Sentiers à travers oliveraies et villages.',tag:'Terre'},
+      {e:'🥾',n:'Sentier E4',t:'Chemin européen',d:'Le chemin E4 passe par Paleochora.',tag:'Randonnée'},
+      {e:'🎣',n:'Pêche',t:'Pêche en mer',d:'Expérience de pêche avec des pêcheurs locaux.',tag:'Mer'},
+      {e:'🧘',n:'Yoga & Bien-être',t:'Relaxation',d:'Cours de yoga matinal sur la plage.',tag:'Bien-être'},
+    ]
+  },
+  exc:{
+    el:[
+      {e:'🌊',n:'Ελαφονήσι',t:'Ημερήσια εκδρομή',d:'Η πιο διάσημη παραλία της Κρήτης με ροζ άμμο.',tag:'45 λεπτά'},
+      {e:'🏔️',n:'Φαράγγι Σαμαριάς',t:'Πεζοπορία',d:'Ξεκινά από Ομαλό, τελειώνει στην Αγία Ρουμέλη.',tag:'75km · 1.5ω'},
+      {e:'🏝️',n:'Νήσος Γαύδος',t:'Ημερήσια κρουαζιέρα',d:'Το νοτιότερο σημείο Ευρώπης. Εξωτικές παραλίες.',tag:'Πλοίο 1.5ω'},
+      {e:'🏛️',n:'Χανιά – Παλιά Πόλη',t:'Πολιτιστική εκδρομή',d:'Βενετικό λιμάνι, Φάρος, χαμάμ και μουσεία.',tag:'75km · 1ω'},
+      {e:'🌺',n:'Φαράγγι Ιμπρου',t:'Εύκολη πεζοπορία',d:'Πιο εύκολο από τη Σαμαριά. Ιδανικό για οικογένειες.',tag:'40km · 45λ'},
+    ],
+    en:[
+      {e:'🌊',n:'Elafonisi',t:'Day trip',d:'Crete\'s most famous beach with pink sand.',tag:'45 min'},
+      {e:'🏔️',n:'Samaria Gorge',t:'Hiking',d:'Starts at Omalos, ends at Agia Roumeli.',tag:'75km · 1.5h'},
+      {e:'🏝️',n:'Gavdos Island',t:'Day cruise',d:'Europe\'s southernmost point. Exotic beaches.',tag:'Ferry 1.5h'},
+      {e:'🏛️',n:'Chania – Old Town',t:'Cultural trip',d:'Venetian harbour, Lighthouse, hammams and museums.',tag:'75km · 1h'},
+      {e:'🌺',n:'Imbros Gorge',t:'Easy hike',d:'Easier than Samaria. Ideal for families.',tag:'40km · 45 min'},
+    ],
+    de:[
+      {e:'🌊',n:'Elafonisi',t:'Tagesausflug',d:'Kretas berühmtester Strand mit rosa Sand.',tag:'45 Min'},
+      {e:'🏔️',n:'Samaria-Schlucht',t:'Wanderung',d:'Start Omalos, Ende Agia Roumeli.',tag:'75km · 1,5h'},
+      {e:'🏝️',n:'Gavdos Insel',t:'Tageskreuzfahrt',d:'Südlichster Punkt Europas. Exotische Strände.',tag:'Fähre 1,5h'},
+      {e:'🏛️',n:'Chania – Altstadt',t:'Kulturausflug',d:'Venezianischer Hafen, Leuchtturm, Hammam und Museen.',tag:'75km · 1h'},
+      {e:'🌺',n:'Imbros-Schlucht',t:'Leichte Wanderung',d:'Einfacher als Samaria. Ideal für Familien.',tag:'40km · 45 Min'},
+    ],
+    fr:[
+      {e:'🌊',n:'Elafonisi',t:'Excursion d\'une journée',d:'La plage la plus célèbre de Crète avec sable rose.',tag:'45 min'},
+      {e:'🏔️',n:'Gorge de Samaria',t:'Randonnée',d:'Départ Omalos, arrivée Agia Roumeli.',tag:'75km · 1h30'},
+      {e:'🏝️',n:'Île de Gavdos',t:'Croisière d\'une journée',d:'Le point le plus au sud d\'Europe.',tag:'Ferry 1h30'},
+      {e:'🏛️',n:'La Canée – Vieille Ville',t:'Excursion culturelle',d:'Port vénitien, Phare, hammams et musées.',tag:'75km · 1h'},
+      {e:'🌺',n:'Gorge d\'Imbros',t:'Randonnée facile',d:'Plus facile que Samaria. Idéal pour les familles.',tag:'40km · 45 min'},
+    ]
+  }
+};
+
+const DEFAULT_VILLA = {
+  pool:'Κοινόχρηστη πισίνα · 08:00–22:00',
+  wifi:'Δωρεάν παντού · Κωδικός: krystallon2024',
+  parking:'Δωρεάν ιδιωτικός χώρος στάθμευσης',
+  ac:'Κλιματισμός σε όλα τα δωμάτια',
+  kitchen:'Πλήρως εξοπλισμένη κουζίνα σε κάθε villa',
+  bbq:'Διαθέσιμο κατόπιν κράτησης',
+  checkin:'από 14:00',
+  checkout:'έως 11:00',
+  quiet:'23:00 – 08:00',
+  pets:'Κατόπιν συνεννόησης',
+  phone:'+30 28230 XXXXX',
+  email:'info@krystallon.gr'
+};
+
+// ── STATE ────────────────────────────────────────────────────────
+let data = JSON.parse(JSON.stringify(DEFAULT_DATA));
+let villa = {...DEFAULT_VILLA};
+let curSection = 'rest';
+let curLang = 'el';
+let editIdx = -1;
+let pendingDel = null;
+
+// ── GITHUB API ───────────────────────────────────────────────────
+// ── NETLIFY API ──────────────────────────────────────────────────
+async function ghLoad(){
+  showStatus('⏳ Φόρτωση δεδομένων...', 'info');
+  try{
+    const res = await fetch(API, { cache:'no-store' });
+    if(res.ok){
+      const json = await res.json();
+      if(json.data)  data  = json.data;
+      if(json.villa) villa = json.villa;
+      showStatus('✅ Φορτώθηκαν τα δεδομένα', 'ok');
+    } else {
+      showStatus('📋 Χωρίς δεδομένα ακόμα — πατήστε αποθήκευση.', 'info');
+    }
+  } catch(e){
+    showStatus('⚠️ Σφάλμα φόρτωσης: ' + e.message, 'err');
+  }
+}
+
+async function save(){
+  showStatus('💾 Αποθήκευση...', 'info');
+  try{
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-admin-pass': ADMIN_PASS
+      },
+      body: JSON.stringify({ data, villa })
+    });
+    if(!res.ok){ const e=await res.json(); throw new Error(e.error||res.status); }
+    showStatus('✅ Αποθηκεύτηκε!', 'ok');
+  } catch(e){
+    showStatus('❌ Σφάλμα: ' + e.message, 'err');
+    throw e;
+  }
+}
+
+function showStatus(msg, type){
+  let bar = document.getElementById('status-bar');
+  if(!bar) return;
+  bar.textContent = msg;
+  bar.className = 'status-bar ' + (type||'');
+  if(type==='ok') setTimeout(()=>{ bar.textContent=''; bar.className='status-bar'; }, 3000);
+}
+
+const CATS = {
+  rest: {label:'Εστιατόρια & Καφέ', fields:['e','n','t','d','tag','loc','hours','maps_url','embed_url','web_url'], labels:{e:'Emoji',n:'Όνομα',t:'Τύπος',d:'Περιγραφή',tag:'Ετικέτα',loc:'Τοποθεσία',hours:'Ώρες',maps_url:'Google Maps URL',embed_url:'Embed URL (iframe)',web_url:'Ιστοσελίδα URL'}},
+  beach:{label:'Παραλίες',            fields:['e','n','t','d','tag','loc','dist','maps_url','embed_url','web_url'],  labels:{e:'Emoji',n:'Όνομα',t:'Τύπος',d:'Περιγραφή',tag:'Ετικέτα',loc:'Τοποθεσία',dist:'Απόσταση',maps_url:'Google Maps URL',embed_url:'Embed URL (iframe)',web_url:'Ιστοσελίδα URL'}},
+  sights:{label:'Αξιοθέατα',          fields:['e','n','t','d','tag','loc','dist','maps_url','embed_url','web_url'],  labels:{e:'Emoji',n:'Όνομα',t:'Τύπος',d:'Περιγραφή',tag:'Ετικέτα',loc:'Τοποθεσία',dist:'Απόσταση',maps_url:'Google Maps URL',embed_url:'Embed URL (iframe)',web_url:'Ιστοσελίδα URL'}},
+  act:  {label:'Δραστηριότητες',      fields:['e','n','t','d','tag','maps_url','embed_url','web_url'],               labels:{e:'Emoji',n:'Όνομα',t:'Τύπος',d:'Περιγραφή',tag:'Ετικέτα',maps_url:'Google Maps URL',embed_url:'Embed URL (iframe)',web_url:'Ιστοσελίδα URL'}},
+  exc:  {label:'Εκδρομές',            fields:['e','n','t','d','tag','maps_url','embed_url','web_url'],               labels:{e:'Emoji',n:'Όνομα',t:'Τύπος',d:'Περιγραφή',tag:'Ετικέτα',maps_url:'Google Maps URL',embed_url:'Embed URL (iframe)',web_url:'Ιστοσελίδα URL'}},
+};
+const LANGS = ['el','en','de','fr'];
+const LANG_LABELS = {el:'Ελληνικά 🇬🇷', en:'English 🇬🇧', de:'Deutsch 🇩🇪', fr:'Français 🇫🇷'};
+
+// ── AUTH ─────────────────────────────────────────────────────────
+function doLogin(){
+  const v = document.getElementById('pwd-input').value;
+  if(v === ADMIN_PASS){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('admin-app').style.display='block';
+    ghLoad().then(()=>{ showSection('rest'); renderSection(); });
+  } else {
+    document.getElementById('login-err').style.display='block';
+    document.getElementById('login-err').textContent='❌ Λάθος κωδικός';
+    document.getElementById('pwd-input').value='';
+  }
+}
+function doLogout(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('admin-app').style.display='none';
+  document.getElementById('pwd-input').value='';
+  document.getElementById('login-err').style.display='none';
+}
+
+// ── NAVIGATION ───────────────────────────────────────────────────
+function showSection(id){
+  curSection=id; editIdx=-1;
+  document.querySelectorAll('.aside-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('ab-'+id)?.classList.add('on');
+  renderSection();
+}
+
+function renderSection(){
+  const main = document.getElementById('main-area');
+  if(curSection==='villa') { renderVilla(); return; }
+  if(curSection==='io')    { renderIO();    return; }
+  const cat = CATS[curSection];
+  const items = data[curSection][curLang] || [];
+
+  main.innerHTML = `
+    <div class="sec-hdr">
+      <div><h2>${cat.label}</h2><div class="blue-line"></div></div>
+      <button class="btn btn-blue" onclick="openForm(-1)">+ Προσθήκη</button>
+    </div>
+    <div class="lang-tabs">
+      ${LANGS.map(l=>`<button class="lt${l===curLang?' on':''}" onclick="switchLang('${l}')">${LANG_LABELS[l]}</button>`).join('')}
+    </div>
+    <div class="form-card${editIdx===-2?' open':''}" id="form-card">
+      ${renderFormHTML()}
+    </div>
+    <div class="items-list">
+      ${items.length===0
+        ? `<div class="empty-state">Δεν υπάρχουν εγγραφές. Πατήστε "+ Προσθήκη" για να ξεκινήσετε.</div>`
+        : items.map((item,i)=>`
+        <div class="item-row">
+          <div class="item-emoji">${item.e||'📌'}</div>
+          <div class="item-info">
+            <div class="item-type">${item.t||''}</div>
+            <div class="item-name">${item.n||'—'}</div>
+            <div class="item-desc">${item.d||''}</div>
+          </div>
+          <span class="item-tag">${item.tag||''}</span>
+          <div class="item-actions">
+            <button class="btn-edit" onclick="openForm(${i})">✏️ Επεξεργασία</button>
+            <button class="btn-del" onclick="askDelete(${i})">🗑</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  if(editIdx>=0) openForm(editIdx);
+}
+
+function renderFormHTML(){
+  const cat = CATS[curSection];
+  const item = editIdx>=0 ? (data[curSection][curLang][editIdx]||{}) : {};
+  const isNew = editIdx===-2;
+  const title = isNew ? '+ Νέα εγγραφή' : '✏️ Επεξεργασία';
+
+  const urlFields = ['maps_url','embed_url','web_url'];
+  const bigFields = ['d'];
+  const urlHelp = {
+    maps_url:'Π.χ. https://maps.google.com/?q=... · Ανοίγει χάρτη σε νέο tab',
+    embed_url:'Google Maps → Κοινοποίηση → Ενσωμάτωση → αντιγράψτε ΜΟΝΟ το src="..."',
+    web_url:'Π.χ. https://www.restaurant.gr · Σύνδεσμος ιστοσελίδας'
+  };
+  const halfFields = cat.fields.filter(f=>!bigFields.includes(f) && !urlFields.includes(f));
+  const hasUrl = cat.fields.some(f=>urlFields.includes(f));
+
+  return `
+    <h3>${title}</h3>
+    <div class="form-grid">
+      ${halfFields.map(f=>`
+        <div class="field">
+          <label>${cat.labels[f]}</label>
+          <input id="f-${f}" type="text" value="${esc(item[f]||'')}" placeholder="${f==='e'?'🍕':''}">
+        </div>`).join('')}
+    </div>
+    ${bigFields.map(f=>`
+      <div class="field form-grid full" style="margin-top:12px">
+        <label>${cat.labels[f]}</label>
+        <textarea id="f-${f}">${esc(item[f]||'')}</textarea>
+      </div>`).join('')}
+    ${hasUrl?`
+      <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--border)">
+        <div style="font-size:9px;font-weight:700;letter-spacing:0.35em;text-transform:uppercase;color:var(--blue);margin-bottom:14px">🔗 Σύνδεσμοι & Χάρτες</div>
+        ${urlFields.filter(f=>cat.fields.includes(f)).map(f=>`
+          <div class="field" style="margin-bottom:14px">
+            <label>${cat.labels[f]}</label>
+            <input id="f-${f}" type="url" value="${esc(item[f]||'')}" placeholder="${urlHelp[f]}">
+            <span style="font-size:10px;color:var(--mgray);margin-top:3px;display:block">${urlHelp[f]}</span>
+          </div>`).join('')}
+      </div>`:''}
+    <div class="form-actions">
+      <button class="btn btn-blue" onclick="saveItem()">💾 Αποθήκευση</button>
+      <button class="btn btn-outline" onclick="cancelForm()">Ακύρωση</button>
+      ${!isNew?`<button class="btn btn-red" style="margin-left:auto" onclick="askDelete(${editIdx})">🗑 Διαγραφή</button>`:''}
+    </div>`;
+}
+
+function openForm(idx){
+  editIdx = idx===-1 ? -2 : idx;
+  const fc = document.getElementById('form-card');
+  if(!fc) { renderSection(); return; }
+  fc.innerHTML = renderFormHTML();
+  fc.classList.add('open');
+  fc.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function cancelForm(){ editIdx=-1; document.getElementById('form-card')?.classList.remove('open'); }
+
+function switchLang(l){ curLang=l; editIdx=-1; renderSection(); }
+
+async function saveItem(){
+  const cat = CATS[curSection];
+  const item = {};
+  for(const f of cat.fields){
+    const el = document.getElementById('f-'+f);
+    item[f] = el ? el.value.trim() : '';
+  }
+  if(!item.n){ toast('Το πεδίο "Όνομα" είναι υποχρεωτικό','err'); return; }
+
+  if(editIdx===-2){
+    LANGS.forEach(l=>{
+      if(!data[curSection][l]) data[curSection][l]=[];
+      if(l===curLang) data[curSection][l].push({...item});
+      else data[curSection][l].push({...item, n:item.n+' ('+l+')', t:item.t, d:item.d});
+    });
+  } else {
+    data[curSection][curLang][editIdx] = {...item};
+  }
+  try{
+    await save();
+    editIdx=-1; renderSection();
+    toast('Αποθηκεύτηκε ✓','ok');
+  } catch(e){ toast('Σφάλμα αποθήκευσης','err'); }
+}
+
+function askDelete(idx){
+  pendingDel=idx;
+  document.getElementById('del-modal').classList.add('open');
+  document.getElementById('confirm-del').onclick=()=>doDelete();
+}
+async function doDelete(){
+  if(pendingDel===null) return;
+  LANGS.forEach(l=>{ data[curSection][l]?.splice(pendingDel,1); });
+  try{
+    await save();
+    pendingDel=null; closeModal(); editIdx=-1; renderSection();
+    toast('Διαγράφηκε','ok');
+  } catch(e){ toast('Σφάλμα αποθήκευσης','err'); }
+}
+function closeModal(){ document.getElementById('del-modal').classList.remove('open'); pendingDel=null; }
+
+// ── VILLA ─────────────────────────────────────────────────────────
+function renderVilla(){
+  const main=document.getElementById('main-area');
+  const v=villa;
+  const fields=[
+    {key:'pool',label:'Πισίνα'},{key:'wifi',label:'Wi-Fi'},
+    {key:'parking',label:'Parking'},{key:'ac',label:'A/C'},
+    {key:'kitchen',label:'Κουζίνα'},{key:'bbq',label:'BBQ'},
+    {key:'checkin',label:'Check-in'},{key:'checkout',label:'Check-out'},
+    {key:'quiet',label:'Ώρες ησυχίας'},{key:'pets',label:'Κατοικίδια'},
+    {key:'phone',label:'Τηλέφωνο'},{key:'email',label:'Email'},
+  ];
+  main.innerHTML=`
+    <div class="sec-hdr">
+      <div><h2>Παροχές Villas</h2><div class="blue-line"></div></div>
+      <button class="btn btn-blue" onclick="saveVilla()">💾 Αποθήκευση</button>
+    </div>
+    <div class="villa-grid">
+      ${fields.map(f=>`
+        <div class="villa-row">
+          <label>${f.label}</label>
+          <input id="vf-${f.key}" type="text" value="${esc(v[f.key]||'')}">
+        </div>`).join('')}
+    </div>`;
+}
+
+async function saveVilla(){
+  const fields=['pool','wifi','parking','ac','kitchen','bbq','checkin','checkout','quiet','pets','phone','email'];
+  fields.forEach(k=>{ villa[k]=(document.getElementById('vf-'+k)||{}).value||villa[k]; });
+  try{
+    await save();
+    toast('Αποθηκεύτηκαν οι παροχές ✓','ok');
+  } catch(e){ toast('Σφάλμα αποθήκευσης','err'); }
+}
+
+// ── EXPORT / IMPORT ───────────────────────────────────────────────
+function renderIO(){
+  const main=document.getElementById('main-area');
+  main.innerHTML=`
+    <div class="sec-hdr"><div><h2>Export / Import</h2><div class="blue-line"></div></div></div>
+
+    <div class="io-section">
+      <h3>📤 Export δεδομένων</h3>
+      <p>Κατεβάστε τα δεδομένα σε αρχείο JSON για να τα μεταφέρετε σε άλλη συσκευή ή να κρατήσετε αντίγραφο ασφαλείας.</p>
+      <div class="io-actions">
+        <button class="btn btn-blue" onclick="exportData()">⬇️ Κατέβασμα JSON</button>
+        <button class="btn btn-outline" onclick="toggleShowJSON()">👁 Προβολή JSON</button>
+      </div>
+      <pre class="io-code" id="json-preview"></pre>
+    </div>
+
+    <div class="io-section">
+      <h3>📥 Import δεδομένων</h3>
+      <p>Φορτώστε ένα αρχείο JSON που εξάγατε από άλλη συσκευή. <strong>Προσοχή:</strong> τα τρέχοντα δεδομένα θα αντικατασταθούν.</p>
+      <div class="io-actions">
+        <label class="btn btn-green" style="cursor:pointer">
+          ⬆️ Επιλογή αρχείου JSON
+          <input type="file" accept=".json" style="display:none" onchange="importData(event)">
+        </label>
+      </div>
+    </div>
+
+    <div class="io-section">
+      <h3>🔄 Επαναφορά εργοστασιακών</h3>
+      <p>Επαναφορά όλων των δεδομένων στις αρχικές τιμές. Όλες οι αλλαγές θα χαθούν.</p>
+      <div class="io-actions">
+        <button class="btn btn-red" onclick="resetData()">⚠️ Επαναφορά</button>
+      </div>
+    </div>`;
+}
+
+function exportData(){
+  const payload={data,villa,exported:new Date().toISOString()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='krystallon-data.json';
+  a.click();
+  toast('Εξαγωγή επιτυχής ✓','ok');
+}
+
+function toggleShowJSON(){
+  const el=document.getElementById('json-preview');
+  if(el.classList.contains('open')){ el.classList.remove('open'); return; }
+  el.textContent=JSON.stringify({data,villa},null,2);
+  el.classList.add('open');
+}
+
+async function importData(evt){
+  const file=evt.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const payload=JSON.parse(e.target.result);
+      if(payload.data)  data=payload.data;
+      if(payload.villa) villa=payload.villa;
+      await save();
+      toast('Import & αποθήκευση επιτυχής ✓','ok');
+      renderSection();
+    } catch(err){ toast('Σφάλμα: ' + err.message,'err'); }
+  };
+  reader.readAsText(file);
+}
+
+async function resetData(){
+  if(!confirm('Επαναφορά όλων των δεδομένων; Αυτό δεν αναιρείται.')) return;
+  data=JSON.parse(JSON.stringify(DEFAULT_DATA));
+  villa={...DEFAULT_VILLA};
+  try{
+    await save();
+    renderIO();
+    toast('Επαναφορά επιτυχής','ok');
+  } catch(e){ toast('Σφάλμα αποθήκευσης','err'); }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function save(){
+  localStorage.setItem('kry_data',JSON.stringify(data));
+  localStorage.setItem('kry_villa',JSON.stringify(villa));
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+function toast(msg,type=''){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.className='toast '+(type||'');
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.getElementById('pwd-input').focus();
+document.getElementById('pwd-input').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
