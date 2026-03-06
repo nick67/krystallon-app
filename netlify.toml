@@ -1,7 +1,7 @@
 [build]
   publish = "."
+  command = "npm install"
 
-[[headers]]
-  for = "/api/*"
-  [headers.values]
-    Access-Control-Allow-Origin = "*"
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
